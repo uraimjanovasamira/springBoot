@@ -3,16 +3,21 @@ package com.example.springBoot.service;
 import com.example.springBoot.mapper.UserMapper;
 import com.example.springBoot.model.Group;
 import com.example.springBoot.model.User;
+import com.example.springBoot.model.dto.request.LoginRequest;
 import com.example.springBoot.model.dto.request.UserRequest;
 import com.example.springBoot.model.dto.request.UserUpdateRequest;
+import com.example.springBoot.model.dto.response.LoginResponse;
 import com.example.springBoot.model.dto.response.UserResponse;
 import com.example.springBoot.repository.GroupRepository;
 import com.example.springBoot.repository.UserRepository;
+import com.example.springBoot.security.jwt.JwtUtil;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,14 +29,29 @@ import java.util.List;
 @Slf4j
 public class UserService {
 
-    private final UserRepository userRepository;
-    private final UserMapper userMapper;
-    private final GroupRepository groupRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
+    final UserRepository userRepository;
+    final UserMapper userMapper;
+    final GroupRepository groupRepository;
+    final BCryptPasswordEncoder passwordEncoder;
+    final JwtUtil jwtUtil;
+    final AuthenticationManager authenticationManager;
 
     public User searchUserByName(String name) {
         return userRepository.findByName(name)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with name: " + name));
+    }
+
+    public LoginResponse login(LoginRequest request) {
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("Incorrect email or password"));
+        String jwt = jwtUtil.generateToken(user);
+        return LoginResponse.builder()
+                .username(user.getUsername())
+                .role(user.getRole())
+                .token(jwt)
+                .build();
+
     }
 
     public UserResponse save(UserRequest request) {

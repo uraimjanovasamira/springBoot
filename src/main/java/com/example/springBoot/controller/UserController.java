@@ -1,8 +1,10 @@
 package com.example.springBoot.controller;
 
 import com.example.springBoot.model.User;
+import com.example.springBoot.model.dto.request.LoginRequest;
 import com.example.springBoot.model.dto.request.UserRequest;
 import com.example.springBoot.model.dto.request.UserUpdateRequest;
+import com.example.springBoot.model.dto.response.LoginResponse;
 import com.example.springBoot.model.dto.response.UserResponse;
 import com.example.springBoot.repository.UserRepository;
 import com.example.springBoot.service.UserService;
@@ -26,6 +28,11 @@ public class UserController {
     public User searchUserByName(@RequestParam String name) {
         return userRepository.findByName(name)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with name: " + name));
+    }
+
+    @PostMapping("/login")
+    public LoginResponse login(@RequestBody LoginRequest request) {
+        return userService.login(request);
     }
 
     @PostMapping

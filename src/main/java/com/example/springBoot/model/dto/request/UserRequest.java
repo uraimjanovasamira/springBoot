@@ -17,6 +17,6 @@ public class UserRequest {
     String password;
     Role role;
     StudyFormat studyFormat;
-    Long course_id;
+//    Long course_id;
     Long group_id;
 }

@@ -6,9 +6,9 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Setter
+@Getter
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Getter
 public class UserResponse {
     Long id;
     String name;

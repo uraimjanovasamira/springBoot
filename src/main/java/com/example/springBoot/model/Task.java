@@ -24,4 +24,5 @@ public class Task {
     @JoinColumn(name = "instructorId")
     User instructor;
 
+
 }
